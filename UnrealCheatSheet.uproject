@@ -1,0 +1,13 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{E06DF0C9-4EB0-9599-3541-9F8D965B3B7B}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "UnrealCheatSheet",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
