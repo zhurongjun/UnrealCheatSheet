@@ -1,0 +1,18 @@
+{
+	"source": "UE",
+	"applications": [
+		{
+			"app_key": "application.generated.ue.unrealcheatsheet-0.ue4editor.exe",
+			"launch_type": "url",
+			"url": "steam://launch/",
+			"action_manifest_path": "D:/CYC_DATA/OwnProject/UnrealCheatSheet/Config/SteamVRBindings/steamvr_manifest.json",
+			"strings":
+			{
+				"en_us":
+				{
+					"name": "UnrealCheatSheet-0 [UE Editor]"
+				}
+			}
+		}
+	]
+}
