@@ -337,5 +337,97 @@ namespace Fuko
 			MipOffset += PerFaceSize * sizeof(FFloat16Color) * CubeFace_MAX;
 		}
 	}
+
+	TArray<MipData> ExportTexture(UTexture2D* InTexture)
+	{
+		TArray<MipData> OutData;
+		if (!InTexture)
+		{
+			UE_LOG(LogTemp,Error,TEXT("Export error, reason: InTexture is null"));
+			return OutData;
+		}
+		
+		// check source
+		if (!InTexture->Source.IsValid())
+		{
+			UE_LOG(LogTemp,Error,TEXT("Export error, reason: InTexture->Source is not valid"));
+			return OutData;
+		}
+
+		// check format 
+		if (InTexture->Source.GetFormat() != TSF_BGRA8 &&
+			InTexture->Source.GetFormat() != TSF_RGBA16 &&
+			InTexture->Source.GetFormat() != TSF_RGBA16F &&
+			InTexture->Source.GetFormat() != TSF_G8)
+		{
+			UE_LOG(LogTemp,Error,TEXT("Export error, reason: InTexture formate is not support"));
+			return OutData;
+		}
+
+		// each mip
+		int32 NumMips = InTexture->Source.GetNumMips();
+		for (int32 CurMip = 0; CurMip < NumMips; ++CurMip)
+		{
+			// get data 
+			MipData Data;
+			Data.Width = InTexture->Source.GetSizeX();
+			Data.Height = InTexture->Source.GetSizeY();
+			TArray64<uint8> RawData;
+			InTexture->Source.GetMipData(RawData, CurMip);
+
+			// encode data
+			for (int32 Row = 0; Row < Data.Height; ++Row)
+			{
+				for (int32 Col = 0; Col < Data.Width; ++Col)
+				{
+					FLinearColor Color;
+
+					// decode color 
+					switch (InTexture->Source.GetFormat())
+					{
+					case TSF_G8:
+					{
+						uint8 G8Color = RawData[Row * Data.Width + Col];		
+						Color = FLinearColor(FColor(G8Color,G8Color,G8Color));
+						break;
+					}
+					case TSF_BGRA8:
+					case TSF_BGRE8:
+					{
+						FColor RawColor = *(FColor*)&RawData[Row * Data.Width * 4 + Col * 4];
+						Color = FLinearColor(RawColor);
+						break;
+					}
+					case TSF_RGBA16:
+					case TSF_RGBA16F:
+					{
+						FFloat16Color RawColor = *(FFloat16Color*)&RawData[Row * Data.Width * 8 + Col * 8];
+						Color = FLinearColor(RawColor);
+						break;
+					}
+
+					// current not support 
+					case TSF_RGBA8: 
+					case TSF_RGBE8:
+					case TSF_G16:
+					case TSF_MAX:
+					case TSF_Invalid:
+					default:
+						UE_LOG(LogTemp,Error,TEXT("Export error, reason: InTexture formate is not support"));
+						return TArray<MipData>();
+						break;
+					}
+
+					Data.Data.Add(Color);
+				}
+			}
+			
+			// push 
+			OutData.Add(Data);
+		}
+
+		
+		return OutData;
+	}
 }
 

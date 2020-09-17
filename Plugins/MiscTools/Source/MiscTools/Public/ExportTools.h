@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 
 class USphereReflectionCaptureComponent;
+
+// export mesh & animation 
 namespace Fuko
 {
 	
@@ -102,4 +104,17 @@ namespace Fuko
 	// export reflection capture data
 	void ExportReflectionCaptureDataHDR(const USphereReflectionCaptureComponent* InReflectionCapture);
 	void ExportReflectionCaptureDataLDR(const USphereReflectionCaptureComponent* InReflectionCapture);
+}
+
+// export texture
+namespace Fuko
+{
+	struct MipData
+	{
+		int32 					Width;
+		int32 					Height;
+		TArray<FLinearColor> 	Data;
+	};
+
+	TArray<MipData> ExportTexture(const UTexture2D* InTexture);
 }
