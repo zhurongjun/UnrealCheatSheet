@@ -1,0 +1,17 @@
+﻿#include "/Engine/Public/Platform.ush"
+
+// output texture 
+RWTexture2D<float4> RWOut;
+
+[numthreads(32,32,1)]
+void Main(
+	uint3 GroupID : SV_GroupID,						// 在整个线程组中的ID  
+	uint3 GroupThreadID : SV_GroupThreadID,			// 一个线程组中的线程ID 
+	uint3 DispatchThreadID : SV_DispatchThreadID	// 在全局线程中的线程ID，等价于 SV_GroupID * numthreads + SV_GroupThreadID  
+)
+{
+	// here just output single color  
+	RWOut[DispatchThreadID.xy] = float4(1,0,0,1);
+}
+
+

@@ -24,6 +24,9 @@ public class MiscTools : ModuleRules
 			new string[]
 			{
 				"Core",
+				"Engine",
+				"RenderCore" ,		// for register shader path 
+				"RHI" ,				// for use RHI api 
 			}
 			);
 			
@@ -32,15 +35,15 @@ public class MiscTools : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
-				"Engine",
 				"Slate",
 				"SlateCore",
 				
-				"DesktopPlatform",
-				"AssetRegistry",
-				"AssetTools",
-				"UnrealEd",
-				"ContentBrowser" ,
+				"DesktopPlatform",	// for open system dialog 
+				"AssetRegistry",	// for asset operator 
+				"AssetTools",		// for asset operator 
+				"UnrealEd",			// for use editor function 
+				"ContentBrowser" ,	// for open engine dialog 
+				"Projects" ,		// for use IPluginManager 
 			}
 			);
 		
