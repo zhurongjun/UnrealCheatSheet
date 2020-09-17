@@ -116,5 +116,6 @@ namespace Fuko
 		TArray<FLinearColor> 	Data;
 	};
 
-	TArray<MipData> ExportTexture(const UTexture2D* InTexture);
+	TArray<MipData> ExportTexture(UTexture2D* InTexture);
+	TArray<MipData> ExportCubeTexture(UTextureCube* InTexture);
 }

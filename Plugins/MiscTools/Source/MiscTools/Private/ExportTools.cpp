@@ -1,8 +1,11 @@
 ﻿#include "ExportTools.h"
+
+#include "CubemapUnwrapUtils.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/SphereReflectionCaptureComponent.h"
 #include "Engine/MapBuildDataRegistry.h"
+#include "Engine/TextureCube.h"
 #include "Rendering/SkeletalMeshModel.h"
 
 namespace Fuko
@@ -355,12 +358,13 @@ namespace Fuko
 		}
 
 		// check format 
-		if (InTexture->Source.GetFormat() != TSF_BGRA8 &&
+		if (InTexture->Source.GetFormat() != TSF_G8 &&
+			InTexture->Source.GetFormat() != TSF_BGRA8 &&
+			InTexture->Source.GetFormat() != TSF_BGRE8 &&
 			InTexture->Source.GetFormat() != TSF_RGBA16 &&
-			InTexture->Source.GetFormat() != TSF_RGBA16F &&
-			InTexture->Source.GetFormat() != TSF_G8)
+			InTexture->Source.GetFormat() != TSF_RGBA16F)
 		{
-			UE_LOG(LogTemp,Error,TEXT("Export error, reason: InTexture formate is not support"));
+			UE_LOG(LogTemp,Error,TEXT("Export error, reason: InTexture format is not support"));
 			return OutData;
 		}
 
@@ -374,7 +378,7 @@ namespace Fuko
 			Data.Height = InTexture->Source.GetSizeY();
 			TArray64<uint8> RawData;
 			InTexture->Source.GetMipData(RawData, CurMip);
-
+			
 			// encode data
 			for (int32 Row = 0; Row < Data.Height; ++Row)
 			{
@@ -407,13 +411,8 @@ namespace Fuko
 					}
 
 					// current not support 
-					case TSF_RGBA8: 
-					case TSF_RGBE8:
-					case TSF_G16:
-					case TSF_MAX:
-					case TSF_Invalid:
 					default:
-						UE_LOG(LogTemp,Error,TEXT("Export error, reason: InTexture formate is not support"));
+						UE_LOG(LogTemp,Error,TEXT("Export error, reason: InTexture format is not support"));
 						return TArray<MipData>();
 						break;
 					}
@@ -426,6 +425,12 @@ namespace Fuko
 			OutData.Add(Data);
 		}
 
+		return OutData;
+	}
+
+	TArray<MipData> ExportCubeTexture(UTextureCube* InTexture)
+	{
+		TArray<MipData> OutData;
 		
 		return OutData;
 	}
