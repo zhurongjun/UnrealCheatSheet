@@ -37,10 +37,10 @@ void Main(
         float2 Pos = frac(float2(DispatchThreadID.xy) / _GridSize);
 
         // get grid
-        float2 g0 = normalize(RGrid[p0].xy);
-        float2 g1 = normalize(RGrid[p1].xy);
-        float2 g2 = normalize(RGrid[p2].xy);
-        float2 g3 = normalize(RGrid[p3].xy);
+        float2 g0 = normalize(RGrid[p0].xy*2-1);
+        float2 g1 = normalize(RGrid[p1].xy*2-1);
+        float2 g2 = normalize(RGrid[p2].xy*2-1);
+        float2 g3 = normalize(RGrid[p3].xy*2-1);
 
         // lerp x
         float v0 = dot(Pos.xy,g0);

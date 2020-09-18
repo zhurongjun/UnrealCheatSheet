@@ -6,7 +6,7 @@ float 	Seed;
 #define PHI 1.61803398874989484820459 
 inline float GoldNoise(float2 xy, float seed)
 {
-	return frac(sin(distance(xy*PHI, xy)*seed)*xy.x);
+	return frac(tan(distance(xy*PHI, xy)*seed)*xy.x);
 }
 
 // create gold noise 
@@ -14,8 +14,8 @@ inline float GoldNoise(float2 xy, float seed)
 void Main (uint3 id : SV_DispatchThreadID)
 {
 	RWOut[id.xy] = float4(
-		GoldNoise(id.xy + 1, frac(Seed)+1.0)*2-1,
-        GoldNoise(id.xy + 1, frac(Seed)+2.0)*2-1,
-        GoldNoise(id.xy + 1, frac(Seed)+3.0)*2-1,
+		GoldNoise(id.xy + 1, frac(Seed)+1.0),
+        GoldNoise(id.xy + 1, frac(Seed)+2.0),
+        GoldNoise(id.xy + 1, frac(Seed)+3.0),
         1);
 }

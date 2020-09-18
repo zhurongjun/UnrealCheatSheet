@@ -7,6 +7,7 @@
 #include "Shader/FSimpleCs.h"
 #include "Shader/GoldNoiseCs.h"
 #include "Shader/PerlinNoise2DCs.h"
+#include "Shader/VoronoiNoise2DCs.h"
 
 template<typename ShaderType, uint32 GroupSize = 32>
 void DispatchComputeShader(
@@ -139,6 +140,38 @@ void UShaderTools::DrawPerlinNoise(UTextureRenderTarget2D* InRenderTarget, UText
         	Params.TexSize = TextureRenderTargetResource->GetSizeXY();
         	Params.MinIterateSize = MinGrid;
             DispatchComputeShader<FPerlinNoise2DCs, 8>(
+                TextureRenderTargetResource ,
+                FeatureLevel ,
+                RHICmdList ,
+                Params);
+        }
+    );
+}
+
+void UShaderTools::DrawVoronoiNoise(UTextureRenderTarget2D* InRenderTarget, UTextureRenderTarget2D* InGrid,
+	int InGridSize)
+{
+	check(IsInGameThread());
+
+	if (InRenderTarget == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s: InRenderTarget is null!!!"), TEXT(__FUNCTION__));
+		return;
+	}
+
+	FTextureRenderTargetResource* TextureRenderTargetResource = InRenderTarget->GameThread_GetRenderTargetResource();
+	FTextureRenderTargetResource* GridRes = InGrid->GameThread_GetRenderTargetResource();
+	ERHIFeatureLevel::Type FeatureLevel = GWorld->Scene->GetFeatureLevel();
+
+	ENQUEUE_RENDER_COMMAND(MyCmd)
+    (
+        [=](FRHICommandListImmediate& RHICmdList)
+        {
+            FVoronoiNoise2DCs::FParameters Params;
+            Params.RGrid = RHICreateShaderResourceView(GridRes->GetRenderTargetTexture(), 0);
+            Params.GridSize = InGridSize;
+            Params.TexSize = TextureRenderTargetResource->GetSizeXY();
+            DispatchComputeShader<FVoronoiNoise2DCs, 8>(
                 TextureRenderTargetResource ,
                 FeatureLevel ,
                 RHICmdList ,

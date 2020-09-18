@@ -26,4 +26,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static void DrawPerlinNoise(UTextureRenderTarget2D* InRenderTarget, UTextureRenderTarget2D* InGrid,
 		int MaxGrid = 64,int MinGrid = 4);
+
+	// draw voronoi noise
+	UFUNCTION(BlueprintCallable)
+	static void DrawVoronoiNoise(UTextureRenderTarget2D* InRenderTarget, UTextureRenderTarget2D* InGrid,
+        int InGridSize = 64);
 };
