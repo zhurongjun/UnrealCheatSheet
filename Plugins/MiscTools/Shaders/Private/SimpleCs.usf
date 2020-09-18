@@ -10,8 +10,7 @@ void Main(
 	uint3 DispatchThreadID : SV_DispatchThreadID	// 在全局线程中的线程ID，等价于 SV_GroupID * numthreads + SV_GroupThreadID  
 )
 {
-	// here just output single color  
-	RWOut[DispatchThreadID.xy] = float4(0,0,1,1);
+	RWOut[DispatchThreadID.xy] = float4(DispatchThreadID.xy / 255.f,0,1);
 }
 
 

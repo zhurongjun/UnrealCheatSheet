@@ -17,4 +17,8 @@ public:
 	// here just a example for use shader 
 	UFUNCTION(BlueprintCallable)
 	static void DrawSimpleCs(UTextureRenderTarget2D* InRenderTarget);
+
+	// draw static noise
+	UFUNCTION(BlueprintCallable)
+	static void DrawStaticNoise(UTextureRenderTarget2D* InRenderTarget,float InSeed);
 };

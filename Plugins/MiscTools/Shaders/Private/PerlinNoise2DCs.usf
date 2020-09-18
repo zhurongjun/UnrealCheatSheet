@@ -1,0 +1,45 @@
+﻿#include "/Engine/Public/Platform.ush"
+
+RWTexture2D<float> RWOut;
+Texture2D<float> RGrad;
+
+int    GradSize;
+int    MinIterateSize;
+
+[numthreads(32,32,1)]
+void MainNoise(
+    uint3 DispatchThreadID : SV_DispatchThreadID
+)
+{
+    int _GridSize = GridSize;
+
+    float resultScale = 1;
+
+    while(_GridSize >= MinIterateSize)
+    {
+        uint2 Grid0 = DispatchThreadID.xy / _GridSize;
+
+        // get grid and grid pos 
+        float2 p0 = floor(DispatchThreadID.xy / GradSize) * GradSize;
+        float2 p1 = p0 + float2(1, 0) * GradSize;
+        float2 p2 = p0 + float2(0, 1) * GradSize;
+        float2 p3 = p0 + float2(1, 1) * GradSize;
+        float2 PosInGrid = (DispatchThreadID.xy - p0) / GradSize;
+
+        //  
+        
+        // ...
+        // Get gradient from Grid[] and calculate interpolated noise value.
+        // ...
+
+        if(gridRes == GridSize)
+            NoiseOutput[id.xy] = smoothLerp(x1, x2, pos.y);
+        else
+            NoiseOutput[id.xy] += smoothLerp(x1, x2, pos.y) * resultScale;
+
+        gridSize = gridSize / 2;
+
+        resultScale /= 2;
+    }
+    NoiseOutput[id.xy] = NoiseOutput[id.xy] * 0.5 + 0.5;
+}
