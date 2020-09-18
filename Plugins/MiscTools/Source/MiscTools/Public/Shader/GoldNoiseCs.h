@@ -4,10 +4,10 @@
 #include "ShaderParameterUtils.h"
 #include "ShaderParameterStruct.h"
 
-class FStaticNoiseCs : public FGlobalShader
+class FGoldNoiseCs : public FGlobalShader
 {
-	DECLARE_SHADER_TYPE(FStaticNoiseCs, Global)
-	SHADER_USE_PARAMETER_STRUCT(FStaticNoiseCs, FGlobalShader);
+	DECLARE_SHADER_TYPE(FGoldNoiseCs, Global)
+	SHADER_USE_PARAMETER_STRUCT(FGoldNoiseCs, FGlobalShader);
 
 	BEGIN_SHADER_PARAMETER_STRUCT(FParameters, )
 		SHADER_PARAMETER(float, Seed)
@@ -27,4 +27,4 @@ public:
 	}
 };
 
-IMPLEMENT_SHADER_TYPE(, FStaticNoiseCs, TEXT("/Plugin/MiscTools/Private/StaticNoiseCs.usf"), TEXT("Main"), SF_Compute);
+IMPLEMENT_SHADER_TYPE(, FGoldNoiseCs, TEXT("/Plugin/MiscTools/Private/GoldNoiseCs.usf"), TEXT("Main"), SF_Compute);

@@ -20,5 +20,10 @@ public:
 
 	// draw static noise
 	UFUNCTION(BlueprintCallable)
-	static void DrawStaticNoise(UTextureRenderTarget2D* InRenderTarget,float InSeed);
+	static void DrawGoldNoise(UTextureRenderTarget2D* InRenderTarget, float InSeed);
+
+	// draw perlin noise
+	UFUNCTION(BlueprintCallable)
+	static void DrawPerlinNoise(UTextureRenderTarget2D* InRenderTarget, UTextureRenderTarget2D* InGrid,
+		int MaxGrid = 64,int MinGrid = 4);
 };

@@ -1,45 +1,62 @@
 ﻿#include "/Engine/Public/Platform.ush"
 
-RWTexture2D<float> RWOut;
-Texture2D<float> RGrad;
+RWTexture2D<float4> RWOut;
+Texture2D<float4> RGrid;
 
-int    GradSize;
+int2   TexSize;
+int    GridSize;
 int    MinIterateSize;
 
+inline float SmoothLerp(float v1, float v2, float alpha)
+{
+    alpha = pow(alpha,5) * 6 - pow(alpha,4) * 15 + pow(alpha,3) * 10;
+    return (1 - alpha) * v1 + alpha * v2;
+}
+
+
 [numthreads(32,32,1)]
-void MainNoise(
+void Main(
     uint3 DispatchThreadID : SV_DispatchThreadID
 )
 {
     int _GridSize = GridSize;
+    float ResultScale = 1.0f;
 
-    float resultScale = 1;
+    float Color = 0;
 
+    // fbm loop 
     while(_GridSize >= MinIterateSize)
     {
-        uint2 Grid0 = DispatchThreadID.xy / _GridSize;
-
         // get grid and grid pos 
-        float2 p0 = floor(DispatchThreadID.xy / GradSize) * GradSize;
-        float2 p1 = p0 + float2(1, 0) * GradSize;
-        float2 p2 = p0 + float2(0, 1) * GradSize;
-        float2 p3 = p0 + float2(1, 1) * GradSize;
-        float2 PosInGrid = (DispatchThreadID.xy - p0) / GradSize;
+        uint2 Base = DispatchThreadID.xy / _GridSize;
+        uint2 GridMod = TexSize / _GridSize; // for repeat noise 
+        uint2 p0 = (Base + uint2(0, 0)) % GridMod;
+        uint2 p1 = (Base + uint2(1, 0)) % GridMod;
+        uint2 p2 = (Base + uint2(0, 1)) % GridMod;
+        uint2 p3 = (Base + uint2(1, 1)) % GridMod;
+        float2 Pos = frac(float2(DispatchThreadID.xy) / _GridSize);
 
-        //  
-        
-        // ...
-        // Get gradient from Grid[] and calculate interpolated noise value.
-        // ...
+        // get grid
+        float2 g0 = normalize(RGrid[p0].xy);
+        float2 g1 = normalize(RGrid[p1].xy);
+        float2 g2 = normalize(RGrid[p2].xy);
+        float2 g3 = normalize(RGrid[p3].xy);
 
-        if(gridRes == GridSize)
-            NoiseOutput[id.xy] = smoothLerp(x1, x2, pos.y);
-        else
-            NoiseOutput[id.xy] += smoothLerp(x1, x2, pos.y) * resultScale;
+        // lerp x
+        float v0 = dot(Pos.xy,g0);
+        float v1 = dot(Pos.xy - float2(1,0),g1);
+        float v2 = dot(Pos.xy - float2(0,1),g2);
+        float v3 = dot(Pos.xy - float2(1,1),g3);
+        float x1 = SmoothLerp(v0,v1,Pos.x);
+        float x2 = SmoothLerp(v2,v3,Pos.x);
 
-        gridSize = gridSize / 2;
+        // lerp y
+        Color += SmoothLerp(x1, x2, Pos.y) * ResultScale;
 
-        resultScale /= 2;
+        // step 
+        _GridSize >>= 1;
+        ResultScale /= 2;
     }
-    NoiseOutput[id.xy] = NoiseOutput[id.xy] * 0.5 + 0.5;
+    Color = Color * 0.5f + 0.5f;
+    RWOut[DispatchThreadID.xy] = float4(Color,Color,Color,1);
 }
