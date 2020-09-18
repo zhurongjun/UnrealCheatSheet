@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "GlobalShader.h"
 #include "ShaderParameterUtils.h"
+#include "ShaderParameterStruct.h"
 
 // !!!Tip: don't forget add shader path in FMiscToolsModule::StartupModule()
 // !!!Tip: LoadingPhase must PostConfigInit
@@ -10,15 +11,13 @@
 class FSimpleCs : public FGlobalShader
 {
 	DECLARE_SHADER_TYPE(FSimpleCs, Global)
-public:
-	FSimpleCs() {}
-	FSimpleCs(const ShaderMetaType::CompiledShaderInitializerType& Initializer)
-		:FGlobalShader(Initializer)
-	{
-		// bind parameter in shader 
-		RWOut.Bind(Initializer.ParameterMap,TEXT("RWOut"));
-	}
+	SHADER_USE_PARAMETER_STRUCT(FSimpleCs, FGlobalShader);
 
+	BEGIN_SHADER_PARAMETER_STRUCT(FParameters, )
+        SHADER_PARAMETER_UAV(RWTexture2D<float4>, RWOut)
+    END_SHADER_PARAMETER_STRUCT()
+
+public:
 	static bool ShouldCompilePermutation(
 		const FGlobalShaderPermutationParameters& Parameters)
 	{
@@ -30,34 +29,6 @@ public:
 	{
 		FGlobalShader::ModifyCompilationEnvironment(Parameters,OutEnvironment);
 	}
-
-	void SetParameters(
-        FRHICommandList& RHICmdList,
-        FTexture2DRHIRef &InOutputSurfaceValue,
-        FUnorderedAccessViewRHIRef& UAV
-    )
-	{
-		FRHIComputeShader* ShaderRHI = RHICmdList.GetBoundComputeShader();
-
-		// barrier for UAV 
-		RHICmdList.TransitionResource(
-			EResourceTransitionAccess::ERWBarrier,
-			EResourceTransitionPipeline::EComputeToCompute, UAV);
-		RWOut.SetTexture(RHICmdList, ShaderRHI, InOutputSurfaceValue, UAV);
-	}
-
-	void UnsetParameters(FRHICommandList& RHICmdList, FUnorderedAccessViewRHIRef& UAV)
-	{
-		// barrier for copy  
-		RHICmdList.TransitionResource(
-			EResourceTransitionAccess::EReadable,
-			EResourceTransitionPipeline::EComputeToCompute, UAV);
-		RWOut.UnsetUAV(RHICmdList, RHICmdList.GetBoundComputeShader());
-	}
-
-private:
-	// used to bind cs out put texture  
-	LAYOUT_FIELD(FRWShaderParameter, RWOut);
 };
 
 // here bind this class to .usf, the path is virtual path witch seated in ShaderTools.cpp 
