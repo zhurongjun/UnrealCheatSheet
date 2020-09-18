@@ -6,7 +6,7 @@ float 	Seed;
 #define PHI 1.61803398874989484820459 
 inline float GoldNoise(float2 xy, float seed)
 {
-	return frac(tan(distance(xy*PHI, xy)*seed)*xy.x);
+	return frac(sin(distance(xy*PHI, xy)*seed)*xy.x);
 }
 
 // create gold noise 
