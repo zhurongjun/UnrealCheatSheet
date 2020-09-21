@@ -13,7 +13,7 @@ public:
 	{
 		if (!FPaths::FileExists(InPath))
 		{
-			UE_LOG(LogTemp,Display,TEXT("Load Dll failed, Reason: Dll in Path \"%s\" is not exist!!!"),*InPath);
+			UE_LOG(LogTemp,Error,TEXT("Load Dll failed, Reason: Dll in Path \"%s\" is not exist!!!"),*InPath);
 			return false;
 		}
 
@@ -21,7 +21,7 @@ public:
 		m_DllHandle = FPlatformProcess::GetDllHandle(*InPath);
 		if (m_DllHandle == nullptr)
 		{
-			UE_LOG(LogTemp,Display,TEXT("Load Dll failed, Reason: Unknown error, Path: %s"),*InPath);
+			UE_LOG(LogTemp,Error,TEXT("Load Dll failed, Reason: Unknown error, Path: %s"),*InPath);
 			return false;
 		}
 
@@ -29,29 +29,52 @@ public:
 		m_Add = (PCalcFun)FPlatformProcess::GetDllExport(m_DllHandle,TEXT("Add"));
 		if (m_Add == nullptr)
 		{
-			UE_LOG(LogTemp,Display,TEXT("Load Dll function Add failed, Reason: Unknown error, Path: %s"),*InPath);
+			UE_LOG(LogTemp,Error,TEXT("Load Dll function Add failed, Reason: Unknown error, Path: %s"),*InPath);
 			return false;
 		}
 		m_Sub = (PCalcFun)FPlatformProcess::GetDllExport(m_DllHandle,TEXT("Sub"));
 		if (m_Sub == nullptr)
 		{
-			UE_LOG(LogTemp,Display,TEXT("Load Dll function Sub failed, Reason: Unknown error, Path: %s"),*InPath);
+			UE_LOG(LogTemp,Error,TEXT("Load Dll function Sub failed, Reason: Unknown error, Path: %s"),*InPath);
 			return false;
 		}
 		m_Mul = (PCalcFun)FPlatformProcess::GetDllExport(m_DllHandle,TEXT("Mul"));
 		if (m_Mul == nullptr)
 		{
-			UE_LOG(LogTemp,Display,TEXT("Load Dll function Mul failed, Reason: Unknown error, Path: %s"),*InPath);
+			UE_LOG(LogTemp,Error,TEXT("Load Dll function Mul failed, Reason: Unknown error, Path: %s"),*InPath);
 			return false;
 		}
 		m_Div = (PCalcFun)FPlatformProcess::GetDllExport(m_DllHandle,TEXT("Div"));
 		if (m_Div == nullptr)
 		{
-			UE_LOG(LogTemp,Display,TEXT("Load Dll function Div failed, Reason: Unknown error, Path: %s"),*InPath);
+			UE_LOG(LogTemp,Error,TEXT("Load Dll function Div failed, Reason: Unknown error, Path: %s"),*InPath);
 			return false;
 		}
+
+		// save path 
+		m_DllPath = InPath;
+		
 		return true;
 	}
+
+	UFUNCTION(BlueprintCallable)
+	void Free()
+	{
+		if (m_DllHandle == nullptr) return;
+
+		FPlatformProcess::FreeDllHandle(m_DllHandle);
+		
+		m_DllHandle = nullptr;
+		m_Add = m_Sub = m_Mul = m_Div = nullptr;
+	}
+
+	UFUNCTION(BlueprintCallable)
+	void Reload()
+	{
+		Free();
+		Load(m_DllPath);
+	}
+	
 	UFUNCTION(BlueprintCallable)
 	bool IsValid() const { return m_DllHandle != nullptr; }
 
@@ -65,6 +88,7 @@ public:
 	int Div(int a, int b) const { return (*m_Div)(a,b); }
 	
 private:
+	FString		m_DllPath;
 	void*		m_DllHandle;
 
 	PCalcFun	m_Add;	// +
