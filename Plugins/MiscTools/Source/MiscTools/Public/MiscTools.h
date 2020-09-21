@@ -5,11 +5,13 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
+class FSlateStyleSet;
+
 class FMiscToolsModule : public IModuleInterface
 {
 public:
-
-	/** IModuleInterface implementation */
+	// ~Begin IModuleInterface 
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
+	// ~End IModuleInterface
 };
