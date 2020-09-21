@@ -26,5 +26,7 @@ void Main(
 		}
 	}
 
-	RWOut[Id.xy] = Distance / length(float2(GridSize,GridSize));
+	float4 FinalColor = Distance / length(float2(GridSize, GridSize));
+	FinalColor.w = 1;
+	RWOut[Id.xy] = FinalColor;
 }

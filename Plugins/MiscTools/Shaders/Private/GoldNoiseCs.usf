@@ -3,6 +3,7 @@
 RWTexture2D<float4> RWOut;
 float 	Seed;
 
+// reference: https://www.shadertoy.com/view/ltB3zD 
 #define PHI 1.61803398874989484820459 
 inline float GoldNoise(float2 xy, float seed)
 {
