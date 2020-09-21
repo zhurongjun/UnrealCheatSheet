@@ -11,20 +11,20 @@ void Main(
     uint3 Id : SV_DispatchThreadID
 )
 {
-	float Distance = GridSize * 3;
+	float Distance = GridSize * 10;
 	int2 MaxGrid = TexSize / GridSize;
 	int2 CenterGrid = Id.xy / GridSize;
 	
-	for(int i = -1; i <= 1; ++i)
+	for(int i = -2; i <= 2; ++i)
 	{
-		for (int j = -1; j <= 1; ++j)
+		for (int j = -2; j <= 2; ++j)
 		{
 			int2 RawGrid = CenterGrid + int2(j, i);
 			int2 Grid = (RawGrid + MaxGrid) % MaxGrid;
-			float2 GridCenter = (RawGrid + RGrid[Grid].xy - 0.5f) * GridSize;
-			Distance = min(distance(Id.xy, GridCenter),Distance);
+			float2 GridCenter = (RawGrid + saturate(RGrid[Grid].xy) - 0.5f) * GridSize;
+			Distance = min(distance(Id.xy, GridCenter), Distance);
 		}
 	}
 
-	RWOut[Id.xy] = Distance / GridSize;
+	RWOut[Id.xy] = Distance / length(float2(GridSize,GridSize));
 }
