@@ -18,5 +18,5 @@ void Main (uint3 id : SV_DispatchThreadID)
 		GoldNoise(id.xy + 1, frac(Seed)+1.0),
         GoldNoise(id.xy + 1, frac(Seed)+2.0),
         GoldNoise(id.xy + 1, frac(Seed)+3.0),
-        1);
+        GoldNoise(id.xy + 1, frac(Seed)+4.0));
 }

@@ -21,7 +21,7 @@ void Main(
 		{
 			int2 RawGrid = CenterGrid + int2(j, i);
 			int2 Grid = (RawGrid + MaxGrid) % MaxGrid;
-			float2 GridCenter = (RawGrid + saturate(RGrid[Grid].xy) - 0.5f) * GridSize;
+			float2 GridCenter = (RawGrid + RGrid[Grid].xy) * GridSize;
 			Distance = min(distance(Id.xy, GridCenter), Distance);
 		}
 	}
