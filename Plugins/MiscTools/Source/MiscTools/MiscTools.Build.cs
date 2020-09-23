@@ -44,6 +44,9 @@ public class MiscTools : ModuleRules
 				"UnrealEd",			// for use editor function 
 				"ContentBrowser" ,	// for open engine dialog 
 				"Projects" ,		// for use IPluginManager 
+				"UMG" ,				// for use UMG function 
+				"Blutility",		// for use blueprint functions
+				"UMGEditor",		// Bluetility dependency 
 			}
 			);
 		

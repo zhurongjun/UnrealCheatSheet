@@ -45,7 +45,5 @@ public:
         const FString& InDefaultName = TEXT("") ,
         const FString& InDefaultPath = TEXT("/Game/") ,
 		bool AllowOverlapExistAsset = false);
-
-	
 	//======================end open unreal dialog=======================
 };
