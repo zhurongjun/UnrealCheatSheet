@@ -8,6 +8,8 @@
 #include "AssetToolsModule.h"
 #include "ContentBrowserModule.h"
 #include "IContentBrowserSingleton.h"
+#include "Engine/AssetManager.h"
+#include "Engine/ObjectLibrary.h"
 
 UObject* UFukoAssetTools::CreateAsset(UClass* InClass, const FString& InName, const FString& InPath)
 {
@@ -191,3 +193,72 @@ bool UFukoAssetTools::DeleteAssets(const TArray<UObject*>& InObjects)
 	ObjectTools::DeleteAssets(AssetToDelete);
 	return true;
 }
+
+UObject* UFukoAssetTools::LoadAsset(const FString& InPath, const FString& InName)
+{
+	FString FullPath = InPath;
+	FullPath.PathAppend(*InName,InName.Len());
+	FullPath.AppendChar(TEXT('.'));
+	FullPath.Append(InName);
+	return StaticLoadObject(UObject::StaticClass(),nullptr, *FullPath);
+}
+
+TArray<UObject*> UFukoAssetTools::LoadAssetsInPath(const FString& InPath, bool bIncludeBlueprint, UClass* InClass)
+{
+	TArray<UObject*>  RetObjects;
+	
+	// create library 
+	UObjectLibrary* Library = UObjectLibrary::CreateLibrary(InClass, bIncludeBlueprint, GIsEditor);
+	if (Library == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Load Assets Failed, Reason: Faild to create library"));
+		return RetObjects;
+	}
+	Library->AddToRoot();	// Prevent gc
+	
+	// load assets
+	FString SearchPath = InPath;
+	SearchPath.RemoveFromEnd("/"); 
+	Library->LoadAssetDataFromPath(SearchPath);
+	Library->LoadAssetsFromAssetData();
+
+	// get asset
+	TArray<FAssetData> AssetsData;
+	Library->GetAssetDataList(AssetsData);
+
+	// fill return array
+	for(int32 i = 0; i < AssetsData.Num(); ++i)
+	{
+		RetObjects.Add(AssetsData[i].GetAsset());
+	}
+	
+	Library->RemoveFromRoot();	// Allow gc
+	return RetObjects;
+}
+
+TArray<FAssetData> UFukoAssetTools::GetAssetsDataInPath(const FString& InPath, bool bIncludeBlueprint, UClass* InClass)
+{
+	TArray<FAssetData>  RetData;
+	
+	// create library 
+	UObjectLibrary* Library = UObjectLibrary::CreateLibrary(InClass, bIncludeBlueprint, GIsEditor);
+	if (Library == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Load Assets Failed, Reason: Faild to create library"));
+		return RetData;
+	}
+	Library->AddToRoot();	// Prevent gc
+	
+	// load assets
+	FString SearchPath = InPath;
+	SearchPath.RemoveFromEnd("/"); 
+	Library->LoadAssetDataFromPath(SearchPath);
+
+	// get asset
+	Library->GetAssetDataList(RetData);
+	
+	Library->RemoveFromRoot();	// Allow gc
+	return RetData;
+	
+}
+

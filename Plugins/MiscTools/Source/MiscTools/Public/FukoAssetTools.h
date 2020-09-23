@@ -31,4 +31,13 @@ public:
 	static bool DeleteAsset(UObject* InObject);
 	UFUNCTION(BlueprintCallable)
 	static bool DeleteAssets(const TArray<UObject*>& InObjects);
+
+	UFUNCTION(BlueprintCallable)
+	static UObject* LoadAsset(const FString& InPath, const FString& InName);
+
+	UFUNCTION(BlueprintCallable)
+	static TArray<UObject*> LoadAssetsInPath(const FString& InPath, bool bIncludeBlueprint = true ,UClass* InClass = nullptr);
+
+	UFUNCTION(BlueprintCallable)
+	static TArray<FAssetData> GetAssetsDataInPath(const FString& InPath, bool bIncludeBlueprint = true ,UClass* InClass = nullptr);
 };
