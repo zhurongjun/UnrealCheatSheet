@@ -349,82 +349,104 @@ namespace Fuko
 			UE_LOG(LogTemp,Error,TEXT("Export error, reason: InTexture is null"));
 			return OutData;
 		}
-		
-		// check source
-		if (!InTexture->Source.IsValid())
-		{
-			UE_LOG(LogTemp,Error,TEXT("Export error, reason: InTexture->Source is not valid"));
-			return OutData;
-		}
 
-		// check format 
-		if (InTexture->Source.GetFormat() != TSF_G8 &&
-			InTexture->Source.GetFormat() != TSF_BGRA8 &&
-			InTexture->Source.GetFormat() != TSF_BGRE8 &&
-			InTexture->Source.GetFormat() != TSF_RGBA16 &&
-			InTexture->Source.GetFormat() != TSF_RGBA16F)
-		{
-			UE_LOG(LogTemp,Error,TEXT("Export error, reason: InTexture format is not support"));
-			return OutData;
-		}
+		int32 NumMips = InTexture->GetNumMips();
 
-		// each mip
-		int32 NumMips = InTexture->Source.GetNumMips();
-		for (int32 CurMip = 0; CurMip < NumMips; ++CurMip)
+		// each mip 
+		for (int32 i = 0; i < NumMips; ++i)
 		{
-			// get data 
-			MipData Data;
-			Data.Width = InTexture->Source.GetSizeX();
-			Data.Height = InTexture->Source.GetSizeY();
-			TArray64<uint8> RawData;
-			InTexture->Source.GetMipData(RawData, CurMip);
+			MipData CurOutMip;
+			FTexture2DMipMap* CurMip = &InTexture->PlatformData->Mips[i];
+			FByteBulkData* ImageData = &CurMip->BulkData;
+
+			int32 MipWidth = CurMip->SizeX;
+			int32 MipHeight = CurMip->SizeY;
+
+			CurOutMip.Width = MipWidth;
+			CurOutMip.Height = MipHeight;
 			
-			// encode data
-			for (int32 Row = 0; Row < Data.Height; ++Row)
+			// each texel
+			for (int32 Row = 0; Row < MipHeight; ++Row)
 			{
-				for (int32 Col = 0; Col < Data.Width; ++Col)
+				for (int32 Col = 0; Col < MipWidth; ++Col)
 				{
-					FLinearColor Color;
+					// use platform data 
+					if ((ImageData->IsBulkDataLoaded() && ImageData->GetBulkDataSize() > 0)
+					&&	(InTexture->GetPixelFormat() == PF_B8G8R8A8 || InTexture->GetPixelFormat() == PF_FloatRGBA))
+					{
+						int32 TexelIndex = Row * MipWidth + Col;
 
-					// decode color 
-					switch (InTexture->Source.GetFormat())
-					{
-					case TSF_G8:
-					{
-						uint8 G8Color = RawData[Row * Data.Width + Col];		
-						Color = FLinearColor(FColor(G8Color,G8Color,G8Color));
-						break;
-					}
-					case TSF_BGRA8:
-					case TSF_BGRE8:
-					{
-						FColor RawColor = *(FColor*)&RawData[Row * Data.Width * 4 + Col * 4];
-						Color = FLinearColor(RawColor);
-						break;
-					}
-					case TSF_RGBA16:
-					case TSF_RGBA16F:
-					{
-						FFloat16Color RawColor = *(FFloat16Color*)&RawData[Row * Data.Width * 8 + Col * 8];
-						Color = FLinearColor(RawColor);
-						break;
-					}
+						if (InTexture->GetPixelFormat() == PF_B8G8R8A8)
+						{
+							FColor* MipData = static_cast<FColor*>(ImageData->Lock(LOCK_READ_ONLY));
+							FColor Texel = MipData[TexelIndex];
+							ImageData->Unlock();
 
-					// current not support 
-					default:
-						UE_LOG(LogTemp,Error,TEXT("Export error, reason: InTexture format is not support"));
-						return TArray<MipData>();
-						break;
-					}
+							if (InTexture->SRGB)
+							{
+								CurOutMip.Data.Emplace(Texel);
+							}
+							else
+							{
+								CurOutMip.Data.Emplace(Texel.ReinterpretAsLinear());
+							}
+						}
+						else if (InTexture->GetPixelFormat() == PF_FloatRGBA)
+						{
+							FFloat16Color* MipData = static_cast<FFloat16Color*>(ImageData->Lock(LOCK_READ_ONLY));
+							FFloat16Color Texel = MipData[TexelIndex];
 
-					Data.Data.Add(Color);
+							ImageData->Unlock();
+							CurOutMip.Data.Emplace(float(Texel.R), float(Texel.G), float(Texel.B), float(Texel.A));
+						}
+					}
+					// read texture source if platform data is unavailable
+					else
+					{
+						FTextureSource& TextureSource = InTexture->Source;
+
+						TArray64<uint8> SourceData;
+						InTexture->Source.GetMipData(SourceData, Mip);
+						ETextureSourceFormat SourceFormat = TextureSource.GetFormat();
+						int32 Index = ((Row * MipWidth) + Col) * TextureSource.GetBytesPerPixel();
+
+						if ((SourceFormat == TSF_BGRA8 || SourceFormat == TSF_BGRE8))
+						{
+							FColor Texel;
+							const uint8* PixelPtr = SourceData.GetData() + Index;
+							Texel = *((FColor*)PixelPtr);
+							if (InTexture->SRGB)
+							{
+								CurOutMip.Data.Emplace(FLinearColor::FromSRGBColor(Texel));
+							}
+							CurOutMip.Data.Emplace(Texel.ReinterpretAsLinear());
+						}
+						else if ((SourceFormat == TSF_RGBA16 || SourceFormat == TSF_RGBA16F))
+						{
+							FFloat16Color Texel;
+							const uint8* PixelPtr = SourceData.GetData() + Index;
+							Texel = *((FFloat16Color*)PixelPtr);
+
+							CurOutMip.Data.Emplace(float(Texel.R), float(Texel.G), float(Texel.B), float(Texel.A));
+						}
+						else if (SourceFormat == TSF_G8)
+						{
+							const uint8* PixelPtr = SourceData.GetData() + Index;
+							const uint8 Value = *PixelPtr;
+							if (InTexture->SRGB)
+							{
+								CurOutMip.Data.Emplace(FLinearColor::FromSRGBColor(FColor(float(Value), 0, 0, 0)));
+							}
+							CurOutMip.Data.Emplace(float(Value), 0, 0, 0);
+						}
+					}
 				}
 			}
-			
-			// push 
-			OutData.Add(Data);
-		}
 
+			// emplace data
+			OutData.Emplace(CurOutMip);
+		}
+		
 		return OutData;
 	}
 

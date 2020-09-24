@@ -14,6 +14,8 @@
  * about unreal pak
  * 		https://github.com/jashking/UnrealPakViewer
  * 		https://github.com/hxhb/HotPatcher
+ *  for blueprint file operator
+ *  	use Built-in plugin BluePrint File Utilities
  */
 UCLASS()
 class MISCTOOLS_API UFukoAssetTools : public UBlueprintFunctionLibrary

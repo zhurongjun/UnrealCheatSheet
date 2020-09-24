@@ -107,6 +107,7 @@ namespace Fuko
 }
 
 // export texture
+// unreal texel sample api UBlueprintMaterialTextureNodesBPLibrary::Texture2D_SampleUV_EditorOnly
 namespace Fuko
 {
 	struct MipData

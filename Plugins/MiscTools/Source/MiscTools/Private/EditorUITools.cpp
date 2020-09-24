@@ -8,7 +8,7 @@ void UEditorUITools::OpenTabWindow(const FString& InTitle, UWidgetBlueprint* InC
 	// create umg widget
 	UUserWidget* NewWidget = nullptr;
 	TSharedRef<SWidget> TabWidget = SNullWidget::NullWidget;
-	TSubclassOf<UUserWidget> WidgetClass = InContent->GeneratedClass;
+	TSubclassOf<UUserWidget> WidgetClass(InContent->GeneratedClass);
 	UWorld* World = GEditor->GetEditorWorldContext().World();
 	if (World)
 	{
