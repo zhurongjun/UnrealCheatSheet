@@ -406,7 +406,7 @@ namespace Fuko
 						FTextureSource& TextureSource = InTexture->Source;
 
 						TArray64<uint8> SourceData;
-						InTexture->Source.GetMipData(SourceData, Mip);
+						InTexture->Source.GetMipData(SourceData, i);
 						ETextureSourceFormat SourceFormat = TextureSource.GetFormat();
 						int32 Index = ((Row * MipWidth) + Col) * TextureSource.GetBytesPerPixel();
 
