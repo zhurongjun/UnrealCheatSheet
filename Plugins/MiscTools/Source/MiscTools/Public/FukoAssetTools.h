@@ -10,7 +10,10 @@
  * tools for asset generate, delete......
  *
  * unreal asset tool, get IAssetTools  
- *     GetAssetTools: UAssetToolsHelpers::GetAssetTools()
+ *     	GetAssetTools: UAssetToolsHelpers::GetAssetTools()
+ * about unreal pak
+ * 		https://github.com/jashking/UnrealPakViewer
+ * 		https://github.com/hxhb/HotPatcher
  */
 UCLASS()
 class MISCTOOLS_API UFukoAssetTools : public UBlueprintFunctionLibrary

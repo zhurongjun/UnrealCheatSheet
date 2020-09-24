@@ -15,9 +15,9 @@ void Main(
 	int2 MaxGrid = TexSize / GridSize;
 	int2 CenterGrid = Id.xy / GridSize;
 	
-	for(int i = -2; i <= 2; ++i)
+	for(int i = -1; i <= 1; ++i)
 	{
-		for (int j = -2; j <= 2; ++j)
+		for (int j = -1; j <= 1; ++j)
 		{
 			int2 RawGrid = CenterGrid + int2(j, i);
 			int2 Grid = (RawGrid + MaxGrid) % MaxGrid;
