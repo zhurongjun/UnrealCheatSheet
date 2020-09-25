@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AssetData.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "FukoAssetTools.generated.h"
 

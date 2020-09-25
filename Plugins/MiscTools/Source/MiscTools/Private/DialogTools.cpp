@@ -1,5 +1,4 @@
 #include "DialogTools.h"
-
 #include "ContentBrowserModule.h"
 #include "EngineUtils.h"
 #include "DesktopPlatformModule.h"

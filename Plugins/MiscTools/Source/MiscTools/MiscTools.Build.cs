@@ -6,11 +6,11 @@ public class MiscTools : ModuleRules
 {
 	public MiscTools(ReadOnlyTargetRules Target) : base(Target)
 	{
-		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+		PCHUsage = ModuleRules.PCHUsageMode.NoPCHs;
 
 		// use cpp17
 		CppStandard = CppStandardVersion.Cpp17;
-		
+
 		PublicIncludePaths.AddRange(
 			new string[] {
 			}

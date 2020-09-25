@@ -2,6 +2,11 @@
 
 #include "CoreMinimal.h"
 
+class UStaticMesh;
+class USkeletalMesh;
+class UAnimSequence;
+class UTexture2D;
+class UTextureCube;
 class USphereReflectionCaptureComponent;
 
 // export mesh & animation 

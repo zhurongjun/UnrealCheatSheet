@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "CoreMinimal.h"
+#include "Misc/Paths.h"
 #include "DllExample.generated.h"
 
 UCLASS(BlueprintType)

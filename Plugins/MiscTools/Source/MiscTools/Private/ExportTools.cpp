@@ -1,10 +1,12 @@
 ﻿#include "ExportTools.h"
 
 #include "CubemapUnwrapUtils.h"
+#include "Animation/AnimSequence.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/SphereReflectionCaptureComponent.h"
 #include "Engine/MapBuildDataRegistry.h"
+#include "Engine/StaticMesh.h"
 #include "Engine/TextureCube.h"
 #include "Rendering/SkeletalMeshModel.h"
 
