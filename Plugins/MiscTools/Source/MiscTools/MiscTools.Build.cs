@@ -6,6 +6,10 @@ public class MiscTools : ModuleRules
 {
 	public MiscTools(ReadOnlyTargetRules Target) : base(Target)
 	{
+		// even i use "CppStandard = CppStandardVersion.Cpp17"
+		// PCH still use cpp14, this cause Error C2855
+		// so i have to disable it 
+		// may be a bug of UBT 
 		PCHUsage = ModuleRules.PCHUsageMode.NoPCHs;
 
 		// use cpp17

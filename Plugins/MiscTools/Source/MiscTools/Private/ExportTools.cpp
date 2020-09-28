@@ -1,5 +1,7 @@
 ﻿#include "ExportTools.h"
 
+
+#include "BmpImageSupport.h"
 #include "CubemapUnwrapUtils.h"
 #include "Animation/AnimSequence.h"
 #include "Components/StaticMeshComponent.h"
@@ -352,7 +354,7 @@ namespace Fuko
 			return OutData;
 		}
 
-		int32 NumMips = InTexture->GetNumMips();
+		int32 NumMips = FMath::Min(InTexture->GetNumMips(),InTexture->Source.GetNumMips());
 
 		// each mip 
 		for (int32 i = 0; i < NumMips; ++i)
@@ -366,23 +368,25 @@ namespace Fuko
 
 			CurOutMip.Width = MipWidth;
 			CurOutMip.Height = MipHeight;
-			
-			// each texel
-			for (int32 Row = 0; Row < MipHeight; ++Row)
+
+			// use platform data 
+			if ((ImageData->IsBulkDataLoaded() && ImageData->GetBulkDataSize() > 0)
+            &&	(InTexture->GetPixelFormat() == PF_B8G8R8A8 || InTexture->GetPixelFormat() == PF_FloatRGBA))
 			{
-				for (int32 Col = 0; Col < MipWidth; ++Col)
+				// lock data 
+				void* RawData = ImageData->Lock(LOCK_READ_ONLY);
+				
+				// each texel
+				for (int32 Row = 0; Row < MipHeight; ++Row)
 				{
-					// use platform data 
-					if ((ImageData->IsBulkDataLoaded() && ImageData->GetBulkDataSize() > 0)
-					&&	(InTexture->GetPixelFormat() == PF_B8G8R8A8 || InTexture->GetPixelFormat() == PF_FloatRGBA))
+					for (int32 Col = 0; Col < MipWidth; ++Col)
 					{
 						int32 TexelIndex = Row * MipWidth + Col;
 
 						if (InTexture->GetPixelFormat() == PF_B8G8R8A8)
 						{
-							FColor* MipData = static_cast<FColor*>(ImageData->Lock(LOCK_READ_ONLY));
+							FColor* MipData = (FColor*)RawData;
 							FColor Texel = MipData[TexelIndex];
-							ImageData->Unlock();
 
 							if (InTexture->SRGB)
 							{
@@ -395,21 +399,31 @@ namespace Fuko
 						}
 						else if (InTexture->GetPixelFormat() == PF_FloatRGBA)
 						{
-							FFloat16Color* MipData = static_cast<FFloat16Color*>(ImageData->Lock(LOCK_READ_ONLY));
+							FFloat16Color* MipData = (FFloat16Color*)RawData;
 							FFloat16Color Texel = MipData[TexelIndex];
 
-							ImageData->Unlock();
 							CurOutMip.Data.Emplace(float(Texel.R), float(Texel.G), float(Texel.B), float(Texel.A));
 						}
 					}
-					// read texture source if platform data is unavailable
-					else
-					{
-						FTextureSource& TextureSource = InTexture->Source;
+				}
 
-						TArray64<uint8> SourceData;
-						InTexture->Source.GetMipData(SourceData, i);
-						ETextureSourceFormat SourceFormat = TextureSource.GetFormat();
+				// unlock data 
+				ImageData->Unlock();
+			}
+			// read texture source if platform data is unavailable
+			else
+			{
+				// get source data 
+				FTextureSource& TextureSource = InTexture->Source;
+				TArray64<uint8> SourceData;
+				InTexture->Source.GetMipData(SourceData, i);
+				ETextureSourceFormat SourceFormat = TextureSource.GetFormat();
+				
+				// each texel
+				for (int32 Row = 0; Row < MipHeight; ++Row)
+				{
+					for (int32 Col = 0; Col < MipWidth; ++Col)
+					{
 						int32 Index = ((Row * MipWidth) + Col) * TextureSource.GetBytesPerPixel();
 
 						if ((SourceFormat == TSF_BGRA8 || SourceFormat == TSF_BGRE8))
@@ -421,7 +435,10 @@ namespace Fuko
 							{
 								CurOutMip.Data.Emplace(FLinearColor::FromSRGBColor(Texel));
 							}
-							CurOutMip.Data.Emplace(Texel.ReinterpretAsLinear());
+							else
+							{
+								CurOutMip.Data.Emplace(Texel.ReinterpretAsLinear());
+							}
 						}
 						else if ((SourceFormat == TSF_RGBA16 || SourceFormat == TSF_RGBA16F))
 						{
@@ -439,12 +456,15 @@ namespace Fuko
 							{
 								CurOutMip.Data.Emplace(FLinearColor::FromSRGBColor(FColor(float(Value), 0, 0, 0)));
 							}
-							CurOutMip.Data.Emplace(float(Value), 0, 0, 0);
+							else
+							{
+								CurOutMip.Data.Emplace(float(Value), 0, 0, 0);
+							}
 						}
 					}
 				}
 			}
-
+			
 			// emplace data
 			OutData.Emplace(CurOutMip);
 		}
@@ -460,3 +480,8 @@ namespace Fuko
 	}
 }
 
+void UExportTools::ExportTextureToBMP(UTexture2D* InTexture)
+{
+	TArray<Fuko::MipData> TextureData = Fuko::ExportTexture(InTexture);
+
+}

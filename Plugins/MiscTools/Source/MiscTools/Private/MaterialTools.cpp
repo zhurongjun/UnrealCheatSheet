@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "MaterialTools.h"
-#include "Materials/MaterialInstanceDynamic.h"
+#include "Materials/Material.h"
 
 void UMaterialTools::GetMaterialParams(UMaterial* InMaterial)
 {

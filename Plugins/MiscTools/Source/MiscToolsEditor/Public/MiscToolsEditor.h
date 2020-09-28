@@ -1,5 +1,5 @@
-﻿#include "CoreMinimal.h"
-
+﻿#pragma once
+#include "CoreMinimal.h"
 #include "Framework/Commands/Commands.h"
 #include "Modules/ModuleManager.h"
 
@@ -41,7 +41,7 @@ public:
 	FMiscToolsEditorCommand()
         : TCommands<FMiscToolsEditorCommand>(
             TEXT("MiscToolsEditor"),
-            NSLOCTEXT("Contexts","MiscToolsEditor","MiscToolsEditor Plguin"),
+            NSLOCTEXT("Contexts","MiscToolsEditor","MiscToolsEditor Plugin"),
             NAME_None,
             TEXT("MiscToolsEditorStyle"))
 	{}

@@ -1,6 +1,9 @@
 ﻿#pragma once
-
 #include "CoreMinimal.h"
+
+#include "Kismet/BlueprintFunctionLibrary.h"
+
+#include "ExportTools.generated.h"
 
 class UStaticMesh;
 class USkeletalMesh;
@@ -8,6 +11,16 @@ class UAnimSequence;
 class UTexture2D;
 class UTextureCube;
 class USphereReflectionCaptureComponent;
+
+// exposure to blueprint
+UCLASS()
+class UExportTools : public UBlueprintFunctionLibrary
+{
+	GENERATED_BODY()
+public:
+	UFUNCTION(BlueprintCallable)
+	static void ExportTextureToBMP(UTexture2D* InTexture);
+};
 
 // export mesh & animation 
 namespace Fuko

@@ -6,6 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MaterialTools.generated.h"
 
+class UMaterial;
 /**
  * Tools for material 
  */
@@ -16,7 +17,4 @@ class MISCTOOLS_API UMaterialTools : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintCallable)
 	static void GetMaterialParams(UMaterial* InMaterial);
-
-	
-	
 };
