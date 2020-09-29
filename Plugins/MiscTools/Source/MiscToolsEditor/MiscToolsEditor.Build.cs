@@ -25,8 +25,12 @@ public class MiscToolsEditor : ModuleRules
 			{
 				"Core",
 				"Engine",
+				"MiscTools",
+				
 				"RenderCore" ,		// for register shader path 
 				"RHI" ,				// for use RHI api 
+				"UMG" ,				// for use UMG 
+				"UMGEditor" ,		// for use UMG blueprint 
 			}
 			);
 			
@@ -44,6 +48,8 @@ public class MiscToolsEditor : ModuleRules
 				"UnrealEd",			// for use editor function 
 				"ContentBrowser" ,	// for open engine dialog 
 				"Projects" ,		// for use IPluginManager 
+				"EditorStyle",		// for use editor style 
+				"Blutility" ,		// for use blueprint 
 			}
 			);
 		
