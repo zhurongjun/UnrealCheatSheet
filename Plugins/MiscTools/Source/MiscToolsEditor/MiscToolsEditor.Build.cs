@@ -42,6 +42,7 @@ public class MiscToolsEditor : ModuleRules
 				"Slate",
 				"SlateCore",
 				
+				"InputCore" ,		// for slate input 
 				"DesktopPlatform",	// for open system dialog 
 				"AssetRegistry",	// for asset operator 
 				"AssetTools",		// for asset operator 
@@ -50,6 +51,7 @@ public class MiscToolsEditor : ModuleRules
 				"Projects" ,		// for use IPluginManager 
 				"EditorStyle",		// for use editor style 
 				"Blutility" ,		// for use blueprint 
+				"GraphEditor" ,		// for use named combo box 
 			}
 			);
 		
