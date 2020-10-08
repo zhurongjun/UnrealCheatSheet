@@ -5,9 +5,11 @@
 #include "ObjectTools.h"
 #include "AssetToolsModule.h"
 #include "ContentBrowserModule.h"
+#include "Editor.h"
 #include "IContentBrowserSingleton.h"
 #include "Engine/AssetManager.h"
 #include "Engine/ObjectLibrary.h"
+#include "Subsystems/AssetEditorSubsystem.h"
 
 UObject* UFukoAssetTools::CreateAsset(UClass* InClass, const FString& InName, const FString& InPath)
 {
@@ -258,5 +260,10 @@ TArray<FAssetData> UFukoAssetTools::GetAssetsDataInPath(const FString& InPath, b
 	Library->RemoveFromRoot();	// Allow gc
 	return RetData;
 	
+}
+
+void UFukoAssetTools::OpenAssetEditor(UObject* Asset)
+{
+	GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->OpenEditorForAsset(Asset);
 }
 

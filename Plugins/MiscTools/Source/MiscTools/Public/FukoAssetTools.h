@@ -46,4 +46,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static TArray<FAssetData> GetAssetsDataInPath(const FString& InPath, bool bIncludeBlueprint = true ,UClass* InClass = nullptr);
+
+	UFUNCTION(BlueprintCallable)
+	static void OpenAssetEditor(UObject* Asset);
 };
