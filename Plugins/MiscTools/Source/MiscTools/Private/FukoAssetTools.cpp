@@ -267,3 +267,41 @@ void UFukoAssetTools::OpenAssetEditor(UObject* Asset)
 	GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->OpenEditorForAsset(Asset);
 }
 
+TArray<UClass*> UFukoAssetTools::GetAllClassFromBlueprintAsset(const FString& InPath)
+{
+
+	TArray<UClass*> RetData;
+
+	// create library 
+	UObjectLibrary* Library = UObjectLibrary::CreateLibrary(UBlueprint::StaticClass(), false, GIsEditor);
+	if (Library == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Load Assets Failed, Reason: Faild to create library"));
+		return RetData;
+	}
+	Library->AddToRoot(); // Prevent gc
+
+	// load assets
+	FString SearchPath = InPath;
+	SearchPath.RemoveFromEnd("/");
+	
+	Library->LoadAssetDataFromPath(SearchPath);
+	Library->LoadAssetsFromAssetData();
+    
+	TArray<FAssetData> AssetData;
+	Library->GetAssetDataList(AssetData);
+
+	
+	for (int32 i = 0; i < AssetData.Num(); i++)
+	{
+		FString FilePath(AssetData[i].GetExportTextName());
+		const FStringAssetReference AssetStreamRef(FilePath);
+		TAssetPtr<UBlueprint> Asset(AssetStreamRef);
+		UBlueprint* Blueprint = Asset.LoadSynchronous();
+		if(Blueprint)
+		{
+			RetData.Add(Blueprint->GeneratedClass);
+		}
+	}
+	return RetData;
+}
