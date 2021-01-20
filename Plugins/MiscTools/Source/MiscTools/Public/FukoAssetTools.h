@@ -49,4 +49,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static void OpenAssetEditor(UObject* Asset);
+
+	UFUNCTION(BlueprintCallable)
+    static TArray<UClass*> GetAllClassFromBlueprintAsset(const FString& InPath);
 };
