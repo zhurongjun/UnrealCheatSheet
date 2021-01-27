@@ -18,7 +18,8 @@ public class UnrealCheatSheet : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
-			
+			"Sockets" ,			// for use sockets 
+			"NetWorking" ,		// for use net work 
 		});
 
 		// Uncomment if you are using Slate UI

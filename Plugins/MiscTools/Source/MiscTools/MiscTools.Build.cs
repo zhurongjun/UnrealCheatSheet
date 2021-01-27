@@ -54,6 +54,8 @@ public class MiscTools : ModuleRules
 				"UMG" ,				// for use UMG function 
 				"Blutility",		// for use blueprint functions
 				"UMGEditor",		// Bluetility dependency 
+				"Sockets" ,			// for use sockets 
+				"NetWorking" ,		// for use net work 
 			}
 			);
 		
